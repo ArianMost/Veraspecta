@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    container_name: veraspecta-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URL=${MONGO_URL}
+
+  mongodb:
+    image: mongo:6
+    container_name: veraspecta-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+
+  frontend:
+    build: ./frontend
+    container_name: veraspecta-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  mongo-express:
+    image: mongo-express
+    container_name: veraspecta-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=${ME_CONFIG_MONGODB_ENABLE_ADMIN}
+      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL}
+      - ME_CONFIG_BASICAUTH_USERNAME=${ME_CONFIG_BASICAUTH_USERNAME}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${ME_CONFIG_BASICAUTH_PASSWORD}
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
